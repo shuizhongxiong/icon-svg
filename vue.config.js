@@ -12,5 +12,8 @@ module.exports = {
         'images': resolve('src/assets/images')
       }
     }
-  }
+  },
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/icon-svg/dist/'
+    : '/'
 }
