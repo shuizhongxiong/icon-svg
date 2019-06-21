@@ -1,6 +1,6 @@
 # icon-svg
 
-## demo <https://shuizhongxiong.github.io/colorbox/dist>
+## demo <https://shuizhongxiong.github.io/icon-svg/dist>
 
 > 参考
 > <https://iconsvg.xyz/>
