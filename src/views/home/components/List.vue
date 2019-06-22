@@ -4,6 +4,7 @@
       <div class="header-logo">
         <img src="~images/logo.png" alt="极光图标编辑工具">
       </div>
+      <div class="header-title">beta</div>
       <div class="header-search">
         <a-input placeholder="请输入内容" v-model="searchValue" @input="searchChange">
           <a-icon slot="prefix" type="search" />
@@ -89,6 +90,11 @@ export default {
         display: block;
         width: 100%;
       }
+    }
+    .header-title {
+      margin-right: 16px;
+      font-size: 16px;
+      font-weight: bold;
     }
     .header-search {
       width: 100%;
