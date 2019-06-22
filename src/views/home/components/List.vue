@@ -98,7 +98,7 @@ export default {
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
-    padding: 24px;
+    padding: 24px 24px 18px 24px;
     max-height: calc(100vh - 60px);
     .main-item {
       display: flex;
