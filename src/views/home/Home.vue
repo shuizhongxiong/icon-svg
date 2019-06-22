@@ -2,7 +2,7 @@
   <div class="home-wrapper">
     <home-list
       class="home-list"
-      @change="svgChange"
+      @change="listChange"
     ></home-list>
     <home-operate
       class="home-operate"
@@ -23,11 +23,11 @@ export default {
   },
   data () {
     return {
-      svg: ''
+      svg: {}
     }
   },
   methods: {
-    svgChange (svg) {
+    listChange (svg) {
       this.svg = svg
     }
   }

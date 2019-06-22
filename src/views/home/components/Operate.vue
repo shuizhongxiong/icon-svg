@@ -46,18 +46,23 @@
               size="small"
               v-model="config.strokeColor"
               :disabled="config.strokeColorDefault"
-              @change="changeNormal('strokeColor')"></a-input>
+              @change="changeNormal('strokeColor')"
+            ></a-input>
             <div class="stroke-color">
               <span
                 :style="{backgroundColor: config.strokeColor}"
-                :class="{disabled: config.strokeColorDefault}"></span>
+                :class="{disabled: config.strokeColorDefault}"
+              ></span>
             </div>
           </div>
         </div>
         <div class="main-group">
           <div class="group-title"></div>
           <div class="group-content">
-            <a-checkbox :checked="config.strokeColorDefault" @change="changeStrokeColorDefault">使用默认颜色</a-checkbox>
+            <a-checkbox
+              :checked="config.strokeColorDefault"
+              @change="changeStrokeColorDefault"
+            >使用默认颜色</a-checkbox>
           </div>
         </div>
         <div class="main-group">
@@ -66,10 +71,12 @@
             <a-button-group>
               <a-button
                 v-for="item of endsList"
-                :key="item"
-                :class="{selected: config.ends === item}"
-                v-html="svgLib[item]"
-                @click="changebtn('ends', item)"></a-button>
+                :key="item.name"
+                :class="{selected: config.ends === item.name}"
+                @click="changebtn('ends', item.name)"
+              >
+                <a-icon :component="item.svg"/>
+              </a-button>
             </a-button-group>
           </div>
         </div>
@@ -79,10 +86,12 @@
             <a-button-group>
               <a-button
                 v-for="item of joinsList"
-                :key="item"
-                :class="{selected: config.joins === item}"
-                v-html="svgLib[item]"
-                @click="changebtn('joins', item)"></a-button>
+                :key="item.name"
+                :class="{selected: config.joins === item.name}"
+                @click="changebtn('joins', item.name)"
+              >
+                <a-icon :component="item.svg"/>
+              </a-button>
             </a-button-group>
           </div>
         </div>
@@ -95,16 +104,14 @@
     </div>
     <div class="operate-btns">
       <a-button @click="download">
-        <a-icon type="download" /> 下载文件
+        <a-icon type="download"/>下载文件
       </a-button>
-      <a-button
-        v-clipboard:copy="operateSvg"
-        v-clipboard:success="onCopy">
+      <a-button v-clipboard:copy="operateSvg" v-clipboard:success="onCopy">
         <template v-if="!copySuccess">
-          <a-icon type="copy" /> 复制代码
+          <a-icon type="copy"/>复制代码
         </template>
         <template v-if="copySuccess">
-          <a-icon type="check" /> 复制成功
+          <a-icon type="check"/>复制成功
         </template>
       </a-button>
     </div>
@@ -112,17 +119,47 @@
 </template>
 
 <script>
-import SVG from '../svg'
+import ButtSvg from '@/assets/icons/butt.svg'
+import RoundSvg from '@/assets/icons/round.svg'
+import SquareSvg from '@/assets/icons/square.svg'
+import BevelSvg from '@/assets/icons/bevel.svg'
+import ArcsSvg from '@/assets/icons/arcs.svg'
 
 export default {
   name: 'HomeOperate',
   data () {
     return {
-      svgLib: SVG,
+      svgName: '',
       svgBg: 'white',
       operateSvg: '',
-      endsList: ['butt', 'round', 'square'],
-      joinsList: ['bevel', 'round', 'arcs'],
+      endsList: [
+        {
+          name: 'butt',
+          svg: ButtSvg
+        },
+        {
+          name: 'round',
+          svg: RoundSvg
+        },
+        {
+          name: 'square',
+          svg: SquareSvg
+        }
+      ],
+      joinsList: [
+        {
+          name: 'bevel',
+          svg: BevelSvg
+        },
+        {
+          name: 'round',
+          svg: RoundSvg
+        },
+        {
+          name: 'arcs',
+          svg: ArcsSvg
+        }
+      ],
       config: {
         iconSize: 48,
         strokeWidth: 3,
@@ -135,12 +172,13 @@ export default {
     }
   },
   props: {
-    svg: String
+    svg: { name: String, svg: String }
   },
   watch: {
     svg (newVal) {
       if (newVal) {
-        let operateSvg = newVal
+        this.svgName = newVal.name
+        let operateSvg = newVal.svg
         Object.keys(this.config).forEach(d => {
           operateSvg = this.change(d, this.config[d], operateSvg)
         })
@@ -153,22 +191,40 @@ export default {
       let svg = ''
       switch (type) {
         case 'iconSize':
-          svg = operateSvg.replace(/width="\d+" height="\d+"/, `width="${value}" height="${value}"`)
+          svg = operateSvg.replace(
+            /width="\d+" height="\d+"/,
+            `width="${value}" height="${value}"`
+          )
           break
         case 'strokeWidth':
-          svg = operateSvg.replace(/stroke-width="[\d.]*"/, `stroke-width="${value}"`)
+          svg = operateSvg.replace(
+            /stroke-width="[\d.]*"/,
+            `stroke-width="${value}"`
+          )
           break
         case 'strokeColor':
-          svg = operateSvg.replace(/stroke="[0-9a-zA-Z#]*"/, `stroke="${value}"`)
+          svg = operateSvg.replace(
+            /stroke="[0-9a-zA-Z#]*"/,
+            `stroke="${value}"`
+          )
           break
         case 'strokeColorDefault':
-          svg = operateSvg.replace(/stroke="[0-9a-zA-Z#]*"/, `stroke="${value ? 'currentColor' : this.config.strokeColor}"`)
+          svg = operateSvg.replace(
+            /stroke="[0-9a-zA-Z#]*"/,
+            `stroke="${value ? 'currentColor' : this.config.strokeColor}"`
+          )
           break
         case 'ends':
-          svg = operateSvg.replace(/stroke-linecap="\w+"/, `stroke-linecap="${value}"`)
+          svg = operateSvg.replace(
+            /stroke-linecap="\w+"/,
+            `stroke-linecap="${value}"`
+          )
           break
         case 'joins':
-          svg = operateSvg.replace(/stroke-linejoin="\w+"/, `stroke-linejoin="${value}"`)
+          svg = operateSvg.replace(
+            /stroke-linejoin="\w+"/,
+            `stroke-linejoin="${value}"`
+          )
           break
         default:
           svg = operateSvg
@@ -185,7 +241,11 @@ export default {
     },
     changeStrokeColorDefault () {
       this.config.strokeColorDefault = !this.config.strokeColorDefault
-      this.operateSvg = this.change('strokeColorDefault', this.config.strokeColorDefault, this.operateSvg)
+      this.operateSvg = this.change(
+        'strokeColorDefault',
+        this.config.strokeColorDefault,
+        this.operateSvg
+      )
     },
     changeBg (bg) {
       if (this.bg === bg) {
@@ -197,9 +257,10 @@ export default {
       const element = document.createElement('a')
       element.setAttribute(
         'href',
-        'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(this.operateSvg)
+        'data:image/svg+xml;charset=utf-8,' +
+          encodeURIComponent(this.operateSvg)
       )
-      element.setAttribute('download', 'test.svg')
+      element.setAttribute('download', this.svg.name + '.svg')
       element.style.display = 'none'
       document.body.appendChild(element)
       element.click()
@@ -233,13 +294,28 @@ export default {
       background-size: 21px 21px;
       background-position: -1px -1px;
       &.white {
-        background-image: linear-gradient(rgba(244, 244, 250, 0.8) 1px, transparent 1px),linear-gradient(90deg, rgba(244, 244, 250, 0.8) 1px, transparent 0),linear-gradient(transparent 1px, #fff 0, #fff 21px, transparent 0);
+        background-image: linear-gradient(
+            rgba(244, 244, 250, 0.8) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(244, 244, 250, 0.8) 1px, transparent 0),
+          linear-gradient(transparent 1px, #fff 0, #fff 21px, transparent 0);
         .preview-icon {
           border: 1px dashed rgba(0, 0, 0, 0.6);
         }
       }
       &.black {
-        background-image: linear-gradient(rgba(244, 244, 250, 0.8) 1px, transparent 1px),linear-gradient(90deg, rgba(244, 244, 250, 0.8) 1px, transparent 0),linear-gradient(transparent 1px, #242424 0, #242424 21px, transparent 0);
+        background-image: linear-gradient(
+            rgba(244, 244, 250, 0.8) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(244, 244, 250, 0.8) 1px, transparent 0),
+          linear-gradient(
+            transparent 1px,
+            #242424 0,
+            #242424 21px,
+            transparent 0
+          );
         .preview-icon {
           border: 1px dashed rgba(255, 255, 255, 0.6);
         }
@@ -312,21 +388,20 @@ export default {
             border: 1px solid rgb(221, 221, 221);
             border-radius: 4px;
             background-color: #fff;
-            >span {
+            > span {
               &.disabled {
-                opacity: .5;
+                opacity: 0.5;
               }
               display: block;
               width: 30px;
               height: 18px;
               border-radius: 2px;
-              box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0px 1px inset
+              box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0px 1px inset;
             }
           }
         }
       }
       .main-code {
-        padding: 0 24px;
         .ant-tabs-card {
           ::v-deep .ant-tabs-bar {
             margin: 0;
