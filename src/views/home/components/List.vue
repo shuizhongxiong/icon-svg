@@ -8,21 +8,20 @@
       <div class="header-search">
         <a-input placeholder="请输入内容" v-model="searchValue" @input="searchChange">
           <a-icon slot="prefix" type="search" />
+          <a-icon v-if="searchValue" slot="suffix" type="close-circle" @click="searchValueClear" />
         </a-input>
       </div>
     </div>
     <div class="list-main">
-      <template v-for="item of list">
-        <a-tooltip :key="item.name">
-          <template slot='title'>{{item.name}}</template>
-          <div
-            class="main-item"
-            v-html="item.toSvg()"
-            :class="{selected: selected === item.name}"
-            @click="selectedChange(item)"
-          ></div>
-        </a-tooltip>
-      </template>
+      <div
+        class="main-item"
+        v-for="item of list"
+        :key="item.name"
+        :title="item.name"
+        v-html="item.toSvg()"
+        :class="{selected: selected === item.name}"
+        @click="selectedChange(item)"
+      ></div>
     </div>
   </div>
 </template>
@@ -36,7 +35,8 @@ export default {
     return {
       searchValue: '',
       selected: '',
-      list: []
+      list: [],
+      timer: null
     }
   },
   props: {
@@ -54,12 +54,21 @@ export default {
       })
     },
     searchChange (e) {
-      const key = e.target.value.toLowerCase().trim()
-      if (!key) {
-        this.list = Object.values(icons)
-      } else {
-        this.list = Object.values(icons).filter((d) => d.name.includes(key))
+      if (this.timer) {
+        clearTimeout(this.timer)
       }
+      this.timer = setTimeout(() => {
+        const key = e.target.value.toLowerCase().trim()
+        if (!key) {
+          this.list = Object.values(icons)
+        } else {
+          this.list = Object.values(icons).filter((d) => d.name.includes(key))
+        }
+      }, 16)
+    },
+    searchValueClear () {
+      this.searchValue = ''
+      this.list = Object.values(icons)
     }
   },
   mounted () {
@@ -98,6 +107,10 @@ export default {
     }
     .header-search {
       width: 100%;
+      ::v-deep .ant-input-suffix>i {
+        cursor: pointer;
+        color: #ccc;
+      }
     }
   }
   .list-main {
